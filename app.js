@@ -2,11 +2,47 @@ const express = require('express')
 const app = express();
 const bodyParser = require('body-parser');
 const port = parseInt(process.argv[2]) || 3333;
-const db = require('./db')
+const db = require('./db');
+const models = require('./models');
+const session = require('express-session');
+
+app.use(session({
+	secret:'suuuuuuper secret',
+	resave:true,
+	saveUninitialized: false
+}))
 
 app.use(bodyParser.json({limit: '50mb', parameterLimit: 1000000}));
 app.use(bodyParser.urlencoded({limit: '50mb', extended: true, parameterLimit: 1000000}));
 
+app.post('/beginximpelsession', (req, res) => {
+	db.models.user.findOrCreate({
+		where: {
+			sessionId: req.sessionId
+		}
+	})
+  .spread((user, created) => {
+    if(created){
+			const ximpelSession = {
+				count: 1
+			};
+			user.ximpelsession.create(ximpelSession);
+		}
+		else {
+			db.query('SELECT MAX(count) AS count FROM ximpelsession WHERE userId=(SELECT sessionId FROM users WHERE sessionId=:sessionId)', 
+			{ replacements: { 
+				sessionId: user.sessionId 
+			}, 
+			type: sequelize.QueryTypes.SELECT })
+			.then( (count) => {
+				const ximpelSession = {
+					count: count
+				};
+				user.ximpelsession.create(ximpelSession);
+			})
+		}
+  })
+});
 
 app.post('/savetodatabase', (req, res) => {
 	const data = req.body.subject;
@@ -46,7 +82,7 @@ app.post('/savetodatabase', (req, res) => {
 				anger: data.facialExpressionsHistory[i][0].value,
 				sad: data.facialExpressionsHistory[i][1].value,
 				surprised: data.facialExpressionsHistory[i][2].value,
-				happy: data.facialExpressionsHistory[i][3].value,
+				joy: data.facialExpressionsHistory[i][3].value,
 				subjectId: subject.id
 			} : null;
 			const opts = undefined;
