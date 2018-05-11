@@ -1,0 +1,106 @@
+ximpelanalytics_test=# \d users
+                                   Table "public.users"
+  Column   |           Type           |                     Modifiers                      
+-----------+--------------------------+----------------------------------------------------
+ id        | integer                  | not null default nextval('users_id_seq'::regclass)
+ sessionId | character varying(255)   | not null
+ createdAt | timestamp with time zone | not null
+ updatedAt | timestamp with time zone | not null
+ deletedAt | timestamp with time zone | 
+Indexes:
+    "users_pkey" PRIMARY KEY, btree (id)
+Referenced by:
+    TABLE "ximpelsessions" CONSTRAINT "ximpelsessions_userId_fkey" FOREIGN KEY ("userId") REFERENCES users(id) ON UPDATE CASCADE ON DELETE SET NULL
+
+ximpelanalytics_test=# \d ximpelsessions
+                                   Table "public.ximpelsessions"
+  Column   |           Type           |                          Modifiers                          
+-----------+--------------------------+-------------------------------------------------------------
+ id        | integer                  | not null default nextval('ximpelsessions_id_seq'::regclass)
+ count     | integer                  | not null
+ createdAt | timestamp with time zone | not null
+ updatedAt | timestamp with time zone | not null
+ deletedAt | timestamp with time zone | 
+ userId    | integer                  | 
+Indexes:
+    "ximpelsessions_pkey" PRIMARY KEY, btree (id)
+Foreign-key constraints:
+    "ximpelsessions_userId_fkey" FOREIGN KEY ("userId") REFERENCES users(id) ON UPDATE CASCADE ON DELETE SET NULL
+Referenced by:
+    TABLE "subjects" CONSTRAINT "subjects_ximpelsessionId_fkey" FOREIGN KEY ("ximpelsessionId") REFERENCES ximpelsessions(id) ON UPDATE CASCADE ON DELETE SET NULL
+
+ximpelanalytics_test=# \d subjects
+                                      Table "public.subjects"
+     Column      |           Type           |                       Modifiers                       
+-----------------+--------------------------+-------------------------------------------------------
+ id              | integer                  | not null default nextval('subjects_id_seq'::regclass)
+ subjectId       | character varying(255)   | not null
+ startTime       | bigint                   | not null
+ createdAt       | timestamp with time zone | not null
+ updatedAt       | timestamp with time zone | not null
+ deletedAt       | timestamp with time zone | 
+ ximpelsessionId | integer                  | 
+Indexes:
+    "subjects_pkey" PRIMARY KEY, btree (id)
+Foreign-key constraints:
+    "subjects_ximpelsessionId_fkey" FOREIGN KEY ("ximpelsessionId") REFERENCES ximpelsessions(id) ON UPDATE CASCADE ON DELETE SET NULL
+Referenced by:
+    TABLE "facialexpressions" CONSTRAINT "facialexpressions_subjectId_fkey" FOREIGN KEY ("subjectId") REFERENCES subjects(id) ON UPDATE CASCADE ON DELETE SET NULL
+    TABLE "mouseclicks" CONSTRAINT "mouseclicks_subjectId_fkey" FOREIGN KEY ("subjectId") REFERENCES subjects(id) ON UPDATE CASCADE ON DELETE SET NULL
+    TABLE "mousemoves" CONSTRAINT "mousemoves_subjectId_fkey" FOREIGN KEY ("subjectId") REFERENCES subjects(id) ON UPDATE CASCADE ON DELETE SET NULL
+
+ximpelanalytics_test=# \d mouseclicks
+                                     Table "public.mouseclicks"
+    Column    |           Type           |                        Modifiers                         
+--------------+--------------------------+----------------------------------------------------------
+ id           | integer                  | not null default nextval('mouseclicks_id_seq'::regclass)
+ x            | integer                  | 
+ y            | integer                  | 
+ appId        | character varying(255)   | 
+ screenWidth  | integer                  | 
+ screenHeight | integer                  | 
+ createdAt    | timestamp with time zone | not null
+ updatedAt    | timestamp with time zone | not null
+ deletedAt    | timestamp with time zone | 
+ subjectId    | integer                  | 
+Indexes:
+    "mouseclicks_pkey" PRIMARY KEY, btree (id)
+Foreign-key constraints:
+    "mouseclicks_subjectId_fkey" FOREIGN KEY ("subjectId") REFERENCES subjects(id) ON UPDATE CASCADE ON DELETE SET NULL
+
+ximpelanalytics_test=# \d mousemoves
+                                     Table "public.mousemoves"
+    Column    |           Type           |                        Modifiers                        
+--------------+--------------------------+---------------------------------------------------------
+ id           | integer                  | not null default nextval('mousemoves_id_seq'::regclass)
+ x            | integer                  | 
+ y            | integer                  | 
+ appId        | character varying(255)   | 
+ screenWidth  | integer                  | 
+ screenHeight | integer                  | 
+ createdAt    | timestamp with time zone | not null
+ updatedAt    | timestamp with time zone | not null
+ deletedAt    | timestamp with time zone | 
+ subjectId    | integer                  | 
+Indexes:
+    "mousemoves_pkey" PRIMARY KEY, btree (id)
+Foreign-key constraints:
+    "mousemoves_subjectId_fkey" FOREIGN KEY ("subjectId") REFERENCES subjects(id) ON UPDATE CASCADE ON DELETE SET NULL
+
+ximpelanalytics_test=# \d facialexpressions
+                                   Table "public.facialexpressions"
+  Column   |           Type           |                           Modifiers                            
+-----------+--------------------------+----------------------------------------------------------------
+ id        | integer                  | not null default nextval('facialexpressions_id_seq'::regclass)
+ anger     | double precision         | 
+ sad       | double precision         | 
+ surprised | double precision         | 
+ joy       | double precision         | 
+ createdAt | timestamp with time zone | not null
+ updatedAt | timestamp with time zone | not null
+ deletedAt | timestamp with time zone | 
+ subjectId | integer                  | 
+Indexes:
+    "facialexpressions_pkey" PRIMARY KEY, btree (id)
+Foreign-key constraints:
+    "facialexpressions_subjectId_fkey" FOREIGN KEY ("subjectId") REFERENCES subjects(id) ON UPDATE CASCADE ON DELETE SET NULL
