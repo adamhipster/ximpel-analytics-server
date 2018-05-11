@@ -1,5 +1,3 @@
 node_modules
 .DS_STORE
 snippets.js
-db.js
-test_db.js
