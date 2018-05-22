@@ -3,7 +3,8 @@
 
 # TO CREATE DATABASE
 Sudo -u your_username sql
-create database ximpelanalytics_test;
+create database ximpelanalytics;
+#create database ximpelanalytics_test; #for testing purposes
 
 
 # TESTING
